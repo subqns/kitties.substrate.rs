@@ -10,7 +10,12 @@ import keyring from '@polkadot/ui-keyring';
 import config from '../config';
 
 const parsedQuery = queryString.parse(window.location.search);
-const connectedSocket = parsedQuery.rpc || config.PROVIDER_SOCKET;
+const fix = (url)=>{
+  if (url.startsWith("ws://") || url.startsWith("wss://")) return url ;
+  var prefix = (window.location.protocol == "https:") ? 'wss://' : 'ws://'
+  return prefix + window.location.host + url ;
+}
+const connectedSocket = fix(parsedQuery.rpc || config.PROVIDER_SOCKET);
 console.log(`Connected socket: ${connectedSocket}`);
 
 ///

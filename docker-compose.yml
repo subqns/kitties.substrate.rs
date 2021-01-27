@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  frontend:
+    image: caddy
+    volumes:
+    - ./frontend/build:/srv/build
+    - ./Caddyfile:/etc/caddy/Caddyfile
+    restart: always
+    ports:
+    - 8000:80
+  node:
+    image: debian
+    volumes:
+    - ./node/target/release/node-template:/bin/node-template
+    - ./state:/state
+    command: bash -c "node-template --dev --ws-external --base-path /state"
+    restart: always

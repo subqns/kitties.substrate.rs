@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kitties
+  labels:
+    app: kitties
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kitties
+  serviceName: kitties
+  template:
+    metadata:
+      labels:
+        app: kitties
+    spec:
+      containers:
+      - image: btwiuse/substrate:kitties
+        name: node
+        command:
+        - node-template
+        args:
+        - --dev
+        - --ws-external
+        - --base-path
+        - /state
+        ports:
+        - containerPort: 9944
+          name: rpc
+          protocol: TCP
+      - image: btwiuse/substrate:kitties
+        name: kitties
+        command:
+        - caddy
+        - run
+        args:
+        - -config
+        - /etc/Caddyfile
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /etc/Caddyfile
+          name: caddy-config
+          subPath: Caddyfile
+        - mountPath: /state
+          name: state
+      volumes:
+        - name: caddy-config
+          configMap:
+            name: kitties
+            items:
+              - key: Caddyfile
+                path: Caddyfile
+                mode: 0644
+  volumeClaimTemplates:
+  - metadata:
+      name: state
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 32Gi

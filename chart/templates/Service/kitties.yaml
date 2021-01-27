@@ -1,0 +1,19 @@
+# Kubernetes Service & Deployment file
+apiVersion: v1
+kind: Service
+metadata:
+  name: kitties
+spec:
+  type: ClusterIP
+  selector:
+    app: kitties
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+  - protocol: TCP
+    port: 9944
+    targetPort: 9944
+    name: rpc
+
